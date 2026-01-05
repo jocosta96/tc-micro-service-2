@@ -4,7 +4,6 @@ from typing_extensions import Annotated
 from src.adapters.di.container import container
 from src.config.database import db_config
 from src.config.aws_ssm import set_aws_credentials, get_aws_credentials_status, clear_aws_credentials
-from src.security.http_auth import check_credentials
 
 health_router = APIRouter(tags=["health"])
 
@@ -103,7 +102,6 @@ def reload_configuration():
 @health_router.post("/health/aws-credentials")
 def set_aws_credentials_endpoint(
     credentials: AWSCredentials,
-    login: Annotated[str, Depends(check_credentials)]
 ):
     """Set AWS credentials for SSM access (for labs environment with temporary credentials)
     
@@ -134,7 +132,6 @@ def set_aws_credentials_endpoint(
 
 @health_router.get("/health/aws-credentials")
 def get_aws_credentials_status_endpoint(
-    login: Annotated[str, Depends(check_credentials)]
 ):
     """Get current AWS credentials status
     
@@ -151,7 +148,6 @@ def get_aws_credentials_status_endpoint(
 
 @health_router.delete("/health/aws-credentials")  
 def clear_aws_credentials_endpoint(
-    login: Annotated[str, Depends(check_credentials)]
 ):
     """Clear AWS credentials
     

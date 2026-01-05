@@ -51,7 +51,7 @@ class OrderController:
         self.by_status_use_case = OrderByStatusUseCase(order_repository)
         self.payment_request_use_case: OrderPaymentRequestUseCase | None = None
 
-    def create_order(self, data: dict, login: str) -> dict:
+    def create_order(self, data: dict) -> dict:
         """Create a new order"""
         try:
             # Convert data to DTO
@@ -79,7 +79,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def get_order(self, order_internal_id: int, login: str) -> dict:
+    def get_order(self, order_internal_id: int) -> dict:
         """Get order by ID"""
         try:
             result = self.read_use_case.execute(order_internal_id)
@@ -94,7 +94,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def update_order(self, order_internal_id: int, data: dict, login: str) -> dict:
+    def update_order(self, order_internal_id: int, data: dict) -> dict:
         """Update an order"""
         try:
             request = OrderUpdateRequest(
@@ -117,7 +117,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def cancel_order(self, order_internal_id: int, login: str) -> dict:
+    def cancel_order(self, order_internal_id: int) -> dict:
         """Cancel an order"""
         try:
             success = self.cancel_use_case.execute(order_internal_id)
@@ -132,7 +132,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def list_orders(self, skip: int = 0, limit: int = 100, login: str = None) -> dict:
+    def list_orders(self, skip: int = 0, limit: int = 100) -> dict:
         """List all orders"""
         try:
             result = self.list_use_case.execute(skip=skip, limit=limit)
@@ -142,7 +142,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def update_order_status(self, order_internal_id: int, status: str, login: str) -> dict:
+    def update_order_status(self, order_internal_id: int, status: str) -> dict:
         """Update order status"""
         try:
             # Convert OrderStatusType enum to string if needed
@@ -162,7 +162,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def process_payment(self, order_internal_id: int, data: dict, login: str) -> dict:
+    def process_payment(self, order_internal_id: int, data: dict) -> dict:
         """Process payment for an order"""
         try:
             print(f"Processing payment data: {data}")
@@ -194,7 +194,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def get_payment_status(self, order_internal_id: int, login: str) -> dict:
+    def get_payment_status(self, order_internal_id: int) -> dict:
         """Get payment status for an order"""
         try:
             result = self.payment_status_use_case.execute(order_internal_id)
@@ -209,7 +209,7 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-    def request_payment(self, order_internal_id: int, login: str) -> dict:
+    def request_payment(self, order_internal_id: int) -> dict:
         """Initiate payment via payment-service"""
         if not self.payment_request_use_case:
             raise HTTPException(status_code=503, detail="Payment client not configured")
@@ -227,7 +227,7 @@ class OrderController:
 
 
 
-    def get_orders_by_status(self, status: str, login: str) -> list:
+    def get_orders_by_status(self, status: str) -> list:
         """Get orders by status"""
         try:
             result = self.by_status_use_case.execute(status)

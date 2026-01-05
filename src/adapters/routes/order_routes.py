@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 from src.adapters.controllers.order_controller import OrderController
 from src.adapters.di.container import Container
 from src.application.use_cases.order_use_cases import OrderPaymentRequestUseCase
-from src.security.http_auth import check_credentials
 from src.entities.value_objects.order_status import OrderStatusType
 
 
@@ -129,53 +128,48 @@ def get_order_controller() -> OrderController:
 @order_router.post("/create", response_model=OrderResponseModel, status_code=201)
 async def create_order(
     order_data: OrderCreateRequestModel,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Create a new order (checkout)"""
-    return controller.create_order(order_data.dict(), login)
+    return controller.create_order(order_data.dict())
 
 
 @order_router.get("/by-id/{order_id}", response_model=OrderResponseModel)
 async def get_order(
     order_id: int,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Get order by ID"""
-    return controller.get_order(order_id, login)
+    return controller.get_order(order_id)
 
 
 @order_router.put("/update_status/{order_id}", response_model=OrderResponseModel)
 async def update_order_status(
     order_id: int,
     order_data: OrderStatusUpdateRequestModel,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Update order status"""
-    return controller.update_order_status(order_id, order_data.status, login)
+    return controller.update_order_status(order_id, order_data.status)
 
 
 @order_router.delete("/cancel/{order_id}", response_model=SimpleResponseModel)
 async def cancel_order(
     order_id: int,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Cancel an order"""
-    return controller.cancel_order(order_id, login)
+    return controller.cancel_order(order_id)
 
 
 @order_router.get("/list", response_model=OrderListResponseModel)
 async def list_orders(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return"),
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """List all orders with pagination"""
-    return controller.list_orders(skip=skip, limit=limit, login=login)
+    return controller.list_orders(skip=skip, limit=limit)
 
 
 
@@ -185,31 +179,28 @@ async def list_orders(
 async def process_payment(
     order_id: int,
     payment_data: PaymentRequestModel,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Process payment for an order"""
-    return controller.process_payment(order_id, payment_data.dict(), login)
+    return controller.process_payment(order_id, payment_data.dict())
 
 
 @order_router.get("/payment_status/{order_id}", response_model=PaymentStatusResponseModel)
 async def get_payment_status(
     order_id: int,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Get payment status for an order"""
-    return controller.get_payment_status(order_id, login)
+    return controller.get_payment_status(order_id)
 
 
 @order_router.post("/request-payment/{order_id}", response_model=PaymentRequestResponseModel)
 async def request_payment(
     order_id: int,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Initiate payment via payment-service"""
-    return controller.request_payment(order_id, login)
+    return controller.request_payment(order_id)
 
 
 
@@ -217,8 +208,7 @@ async def request_payment(
 @order_router.get("/status/{status}", response_model=List[OrderResponseModel])
 async def get_orders_by_status(
     status: OrderStatusType,
-    controller: OrderController = Depends(get_order_controller),
-    login: str = Depends(check_credentials)
+    controller: OrderController = Depends(get_order_controller)
 ):
     """Get orders by status"""
-    return controller.get_orders_by_status(status.value, login) 
+    return controller.get_orders_by_status(status.value) 
