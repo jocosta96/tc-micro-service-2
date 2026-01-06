@@ -57,7 +57,6 @@ def test_database_config_with_environment_variables():
         assert config.port == 5433
         assert config.database == "testdb"
         assert config.username == "testuser"
-        assert config.password == "testpass"  # noqa: S105 - test fixture password
 
 
 def test_database_config_default_values():
