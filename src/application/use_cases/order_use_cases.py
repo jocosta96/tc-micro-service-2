@@ -10,7 +10,7 @@ from src.application.dto.implementation.order_dto import (
     OrderResponse,
     OrderListResponse,
     PaymentStatusResponse,
-    PaymentRequestResponse
+    PaymentRequestResponse,
 )
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product
@@ -44,55 +44,81 @@ class OrderCreateUseCase:
             raise ValueError(f"Failed to reach catalog service: {exc}") from exc
 
         if not response.ok:
-            raise ValueError(f"Catalog service returned {response.status_code} for {url}")
+            raise ValueError(
+                f"Catalog service returned {response.status_code} for {url}"
+            )
 
         return response.json()
 
     def execute(self, request: OrderCreateRequest) -> OrderResponse:
         """Execute the order creation use case"""
         # Validate customer exists
-        customer = self._fetch_catalog(f"/customer/by-id/{request.customer_internal_id}?include_inactive=false")
-
+        customer = self._fetch_catalog(
+            f"/customer/by-id/{request.customer_internal_id}?include_inactive=false"
+        )
 
         if not customer:
-            raise ValueError(f"Customer with ID {request.customer_internal_id} not found")
+            raise ValueError(
+                f"Customer with ID {request.customer_internal_id} not found"
+            )
 
         # Business rule: Customer must be able to place orders
-        if not customer['is_active'] or (not customer['is_anonymous'] and (not customer['email'] or not customer['document'])):
+        if not customer["is_active"] or (
+            not customer["is_anonymous"]
+            and (not customer["email"] or not customer["document"])
+        ):
             raise ValueError("Customer does not meet requirements to place orders")
 
         # Build order items
         order_items = []
         for item_request in request.order_items:
             # Get product - only allow active products for new orders
-            product_request = self._fetch_catalog(f"/product/by-id/{item_request.product_internal_id}?include_inactive=false")
+            product_request = self._fetch_catalog(
+                f"/product/by-id/{item_request.product_internal_id}?include_inactive=false"
+            )
             if not product_request:
-                raise ValueError(f"Product with ID {item_request.product_internal_id} not found or is deactivated")
-            
+                raise ValueError(
+                    f"Product with ID {item_request.product_internal_id} not found or is deactivated"
+                )
+
             # Additional validation: ensure product is active for new orders
-            if not product_request['is_active']:
-                raise ValueError(f"Product with ID {item_request.product_internal_id} is deactivated and cannot be added to new orders")
-            
+            if not product_request["is_active"]:
+                raise ValueError(
+                    f"Product with ID {item_request.product_internal_id} is deactivated and cannot be added to new orders"
+                )
+
             product = Product(**product_request)
 
             # Get additional ingredients - only allow active ingredients for new orders
             additional_ingredients = []
             for ing_id in item_request.additional_ingredient_internal_ids:
-                ingredient = self._fetch_catalog(f"/ingredient/by-id/{ing_id}?include_inactive=false")
+                ingredient = self._fetch_catalog(
+                    f"/ingredient/by-id/{ing_id}?include_inactive=false"
+                )
                 if not ingredient:
-                    raise ValueError(f"Ingredient with ID {ing_id} not found or is deactivated")
-                if not ingredient['is_active']:
-                    raise ValueError(f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders")
+                    raise ValueError(
+                        f"Ingredient with ID {ing_id} not found or is deactivated"
+                    )
+                if not ingredient["is_active"]:
+                    raise ValueError(
+                        f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders"
+                    )
                 additional_ingredients.append(Ingredient(**ingredient))
 
             # Get remove ingredients - only allow active ingredients for new orders
             remove_ingredients = []
             for ing_id in item_request.remove_ingredient_internal_ids:
-                ingredient = self._fetch_catalog(f"/ingredient/by-id/{ing_id}?include_inactive=false")
+                ingredient = self._fetch_catalog(
+                    f"/ingredient/by-id/{ing_id}?include_inactive=false"
+                )
                 if not ingredient:
-                    raise ValueError(f"Ingredient with ID {ing_id} not found or is deactivated")
-                if not ingredient['is_active']:
-                    raise ValueError(f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders")
+                    raise ValueError(
+                        f"Ingredient with ID {ing_id} not found or is deactivated"
+                    )
+                if not ingredient["is_active"]:
+                    raise ValueError(
+                        f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders"
+                    )
                 remove_ingredients.append(Ingredient(**ingredient))
 
             # Create order item
@@ -100,14 +126,13 @@ class OrderCreateUseCase:
                 order_internal_id=0,  # Will be set by Order entity
                 product=product,
                 additional_ingredient=additional_ingredients,
-                remove_ingredient=remove_ingredients
+                remove_ingredient=remove_ingredients,
             )
             order_items.append(order_item)
 
         # Create order
         order = Order.create(
-            customer_internal_id=request.customer_internal_id,
-            order_items=order_items
+            customer_internal_id=request.customer_internal_id, order_items=order_items
         )
 
         # Set start date
@@ -152,7 +177,9 @@ class OrderUpdateUseCase:
     def __init__(self, order_repository: OrderRepository):
         self.order_repository = order_repository
 
-    def execute(self, order_internal_id: int, request: OrderUpdateRequest) -> Optional[OrderResponse]:
+    def execute(
+        self, order_internal_id: int, request: OrderUpdateRequest
+    ) -> Optional[OrderResponse]:
         """Execute the order update use case"""
         order = self.order_repository.get_by_id(order_internal_id)
         if not order:
@@ -195,13 +222,15 @@ class OrderPaymentProcessUseCase:
     def __init__(self, order_repository: OrderRepository):
         self.order_repository = order_repository
 
-    def execute(self, order_internal_id: int, payment_request: PaymentRequest) -> Optional[OrderResponse]:
+    def execute(
+        self, order_internal_id: int, payment_request: PaymentRequest
+    ) -> Optional[OrderResponse]:
         """Execute the order payment processing use case"""
         payment_data = {
-            'transaction_id': payment_request.transaction_id,
-            'approval_status': payment_request.approval_status,
-            'date': payment_request.date,
-            'message': payment_request.message
+            "transaction_id": payment_request.transaction_id,
+            "approval_status": payment_request.approval_status,
+            "date": payment_request.date,
+            "message": payment_request.message,
         }
 
         order = self.order_repository.process_payment(order_internal_id, payment_data)
@@ -248,7 +277,9 @@ class OrderPaymentRequestUseCase:
             order_id=order_internal_id,
             amount=amount,
             transaction_id=payment_data.get("transaction_id", ""),
-            payment_url=payment_data.get("payment_url") or payment_data.get("qr_code") or payment_data.get("link"),
+            payment_url=payment_data.get("payment_url")
+            or payment_data.get("qr_code")
+            or payment_data.get("link"),
             expires_at=payment_data.get("expires_at"),
         )
 
@@ -258,13 +289,10 @@ class OrderCancelUseCase:
 
     def __init__(self, order_repository: OrderRepository):
         self.order_repository = order_repository
-        
+
     def execute(self, order_internal_id: int) -> bool:
         """Execute the order cancel use case"""
         return self.order_repository.cancel(order_internal_id)
-
-
-
 
 
 class OrderByStatusUseCase:
@@ -276,4 +304,4 @@ class OrderByStatusUseCase:
     def execute(self, status: str) -> List[OrderResponse]:
         """Execute the order by status use case"""
         orders = self.order_repository.get_by_status(status)
-        return [OrderResponse.from_entity(order) for order in orders] 
+        return [OrderResponse.from_entity(order) for order in orders]

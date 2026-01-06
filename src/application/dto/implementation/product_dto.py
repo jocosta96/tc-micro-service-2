@@ -4,6 +4,7 @@ from src.application.dto.interfaces.request_interface import RequestInterface
 from src.application.dto.interfaces.response_interface import ResponseInterface
 from src.entities.product import Product, ProductReceiptItem
 
+
 @dataclass
 class ProductCreateRequest(RequestInterface):
     """DTO for product creation request"""
@@ -22,6 +23,7 @@ class ProductCreateRequest(RequestInterface):
             "sku": self.sku,
             "default_ingredient": self.default_ingredient,
         }
+
 
 @dataclass
 class ProductUpdateRequest(RequestInterface):
@@ -43,6 +45,7 @@ class ProductUpdateRequest(RequestInterface):
             "sku": self.sku,
             "default_ingredient": self.default_ingredient,
         }
+
 
 @dataclass
 class ProductResponse(ResponseInterface):
@@ -73,12 +76,14 @@ class ProductResponse(ResponseInterface):
         # Convert ProductReceiptItem objects to serializable dictionaries
         default_ingredients = []
         for item in entity.default_ingredient:
-            default_ingredients.append({
-                "ingredient_internal_id": item.ingredient.internal_id,
-                "ingredient_name": item.ingredient.name.value,
-                "quantity": item.quantity
-            })
-        
+            default_ingredients.append(
+                {
+                    "ingredient_internal_id": item.ingredient.internal_id,
+                    "ingredient_name": item.ingredient.name.value,
+                    "quantity": item.quantity,
+                }
+            )
+
         return cls(
             internal_id=entity.internal_id,
             name=entity.name.value,
@@ -88,6 +93,7 @@ class ProductResponse(ResponseInterface):
             is_active=entity.is_active,
             default_ingredient=default_ingredients,
         )
+
 
 @dataclass
 class ProductListResponse(ResponseInterface):
@@ -109,4 +115,3 @@ class ProductListResponse(ResponseInterface):
             products=[ProductResponse.from_entity(product) for product in entity],
             total_count=len(entity),
         )
-

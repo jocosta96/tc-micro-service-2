@@ -4,6 +4,7 @@ from src.entities.ingredient import IngredientType
 from src.application.dto.interfaces.request_interface import RequestInterface
 from src.application.dto.interfaces.response_interface import ResponseInterface
 
+
 @dataclass
 class IngredientCreateRequest(RequestInterface):
     """DTO for ingredient creation request"""
@@ -28,6 +29,7 @@ class IngredientCreateRequest(RequestInterface):
             "applies_to_drink": self.applies_to_drink,
             "applies_to_dessert": self.applies_to_dessert,
         }
+
 
 @dataclass
 class IngredientUpdateRequest(RequestInterface):
@@ -55,6 +57,7 @@ class IngredientUpdateRequest(RequestInterface):
             "applies_to_drink": self.applies_to_drink,
             "applies_to_dessert": self.applies_to_dessert,
         }
+
 
 @dataclass
 class IngredientResponse(ResponseInterface):
@@ -98,6 +101,7 @@ class IngredientResponse(ResponseInterface):
             "applies_to_dessert": self.applies_to_dessert,
         }
 
+
 @dataclass
 class IngredientListResponse(ResponseInterface):
     """DTO for ingredient list response"""
@@ -115,6 +119,9 @@ class IngredientListResponse(ResponseInterface):
     def from_entity(cls, entity: Any) -> "IngredientListResponse":
         """Create DTO from entity"""
         return cls(
-            ingredients=[IngredientResponse.from_entity(ingredient) for ingredient in entity.ingredients],
+            ingredients=[
+                IngredientResponse.from_entity(ingredient)
+                for ingredient in entity.ingredients
+            ],
             total_count=entity.total_count,
         )

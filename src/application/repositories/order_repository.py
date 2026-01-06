@@ -8,7 +8,7 @@ from src.entities.order import Order
 class OrderRepository(ABC):
     """
     Abstract interface for Order repository operations.
-    
+
     This interface defines the contract for order data access operations
     without specifying the implementation details.
     """
@@ -22,8 +22,6 @@ class OrderRepository(ABC):
     def get_by_id(self, order_internal_id: int) -> Optional[Order]:
         """Get order by ID"""
         pass
-
-
 
     @abstractmethod
     def get_by_status(self, status: str) -> List[Order]:
@@ -51,11 +49,13 @@ class OrderRepository(ABC):
         pass
 
     @abstractmethod
-    def process_payment(self, order_internal_id: int, payment_data: dict) -> Optional[Order]:
+    def process_payment(
+        self, order_internal_id: int, payment_data: dict
+    ) -> Optional[Order]:
         """Process payment for an order"""
         pass
 
     @abstractmethod
     def get_payment_status(self, order_internal_id: int) -> Optional[dict]:
         """Get payment status for an order"""
-        pass 
+        pass

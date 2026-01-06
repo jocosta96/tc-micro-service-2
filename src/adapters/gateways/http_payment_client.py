@@ -23,7 +23,9 @@ class HTTPPaymentClient:
             raise ValueError(f"Failed to reach payment service: {exc}") from exc
 
         if not resp.ok:
-            raise ValueError(f"Payment service returned {resp.status_code}: {resp.text}")
+            raise ValueError(
+                f"Payment service returned {resp.status_code}: {resp.text}"
+            )
 
         data = resp.json()
         if not data:

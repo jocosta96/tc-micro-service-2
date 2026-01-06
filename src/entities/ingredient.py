@@ -50,7 +50,7 @@ class Ingredient:
         # Rule: Ingredient must have a name
         if not self.name:
             raise ValueError("Ingredient must have a name")
-        
+
         # Rule: Ingredient must have a price
         if not self.price:
             raise ValueError("Ingredient must have a price")
@@ -58,13 +58,13 @@ class Ingredient:
         # Rule: Ingredient must have a type
         if not self.type:
             raise ValueError("Ingredient must have a type")
-        
+
         # Rule: Ingredient must have an usage
         if not (
-            self.applies_to_burger or  
-            self.applies_to_side or 
-            self.applies_to_drink or 
-            self.applies_to_dessert
+            self.applies_to_burger
+            or self.applies_to_side
+            or self.applies_to_drink
+            or self.applies_to_dessert
         ):
             raise ValueError("Ingredient must have an applies_to")
 
@@ -74,23 +74,23 @@ class Ingredient:
             IngredientType.CHEESE,
             IngredientType.VEGETABLE,
             IngredientType.SALAD,
-            IngredientType.SAUCE
+            IngredientType.SAUCE,
         ]:
             raise ValueError("Ingredient must be a valid burger ingredient")
-        
+
         if self.applies_to_side and self.type not in [
             IngredientType.SALAD,
             IngredientType.SAUCE,
             IngredientType.VEGETABLE,
         ]:
             raise ValueError("Ingredient must be a valid side ingredient")
-        
+
         if self.applies_to_drink and self.type not in [
             IngredientType.ICE,
-            IngredientType.MILK
+            IngredientType.MILK,
         ]:
             raise ValueError("Ingredient must be a valid drink ingredient")
-        
+
         if self.applies_to_dessert and self.type not in [
             IngredientType.TOPPING,
         ]:
@@ -100,7 +100,7 @@ class Ingredient:
         return f"Ingredient(internal_id={self.internal_id}, name={self.name}, price={self.price}, is_active={self.is_active})"
 
     def __repr__(self) -> str:
-        return f"Ingredient(internal_id={self.internal_id}, name={self.name}, price={self.price}, is_active={self.is_active})" 
+        return f"Ingredient(internal_id={self.internal_id}, name={self.name}, price={self.price}, is_active={self.is_active})"
 
     @classmethod
     def create(
@@ -113,10 +113,8 @@ class Ingredient:
         applies_to_side: bool,
         applies_to_drink: bool,
         applies_to_dessert: bool,
-
-        internal_id: Optional[int] = None
+        internal_id: Optional[int] = None,
     ) -> "Ingredient":
-
         """Factory method to create an Ingredient"""
         return cls(
             name=Name.create(name),
@@ -127,5 +125,5 @@ class Ingredient:
             applies_to_side=applies_to_side,
             applies_to_drink=applies_to_drink,
             applies_to_dessert=applies_to_dessert,
-            internal_id=internal_id
+            internal_id=internal_id,
         )

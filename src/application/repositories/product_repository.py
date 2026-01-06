@@ -3,6 +3,7 @@ from typing import List, Optional
 from src.entities.product import Product, ProductCategory
 from src.entities.value_objects.sku import SKU
 
+
 class ProductRepository(ABC):
     """
     Repository interface for Product entity.
@@ -14,12 +15,16 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_id(self, product_internal_id: int, include_inactive: bool = False) -> Optional[Product]:
+    def find_by_id(
+        self, product_internal_id: int, include_inactive: bool = False
+    ) -> Optional[Product]:
         """Find a product by internal ID"""
         pass
 
     @abstractmethod
-    def find_by_sku(self, sku: SKU, include_inactive: bool = False) -> Optional[Product]:
+    def find_by_sku(
+        self, sku: SKU, include_inactive: bool = False
+    ) -> Optional[Product]:
         """Find a product by SKU"""
         pass
 
@@ -39,7 +44,9 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    def exists_by_id(self, product_internal_id: int, include_inactive: bool = False) -> bool:
+    def exists_by_id(
+        self, product_internal_id: int, include_inactive: bool = False
+    ) -> bool:
         """Check if a product exists by internal ID"""
         pass
 
@@ -49,6 +56,8 @@ class ProductRepository(ABC):
         pass
 
     @abstractmethod
-    def exists_by_category(self, category: ProductCategory, include_inactive: bool = False) -> bool:
+    def exists_by_category(
+        self, category: ProductCategory, include_inactive: bool = False
+    ) -> bool:
         """Check if a product exists by category"""
         pass

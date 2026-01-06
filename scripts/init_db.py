@@ -17,7 +17,11 @@ from src.config.database import db_config  # noqa: E402
 from src.adapters.di.container import container  # noqa: E402
 from src.entities.customer import Customer  # noqa: E402
 from src.entities.ingredient import Ingredient, IngredientType  # noqa: E402
-from src.entities.product import Product, ProductCategory, ProductReceiptItem  # noqa: E402
+from src.entities.product import (
+    Product,
+    ProductCategory,
+    ProductReceiptItem,
+)  # noqa: E402
 from src.entities.order import Order, OrderItem  # noqa: E402
 from src.entities.value_objects.money import Money  # noqa: E402
 from src.entities.value_objects.sku import SKU  # noqa: E402
@@ -61,12 +65,16 @@ def create_sample_customers():
         for customer_data in sample_customers:
             # Check if customer already exists by email
             if repository.exists_by_email(customer_data["email"]):
-                print(f"Customer with email {customer_data['email']} already exists, skipping...")
+                print(
+                    f"Customer with email {customer_data['email']} already exists, skipping..."
+                )
                 continue
-                
+
             # Check if customer already exists by document
             if repository.exists_by_document(customer_data["document"]):
-                print(f"Customer with document {customer_data['document']} already exists, skipping...")
+                print(
+                    f"Customer with document {customer_data['document']} already exists, skipping..."
+                )
                 continue
 
             customer = Customer.create_registered(
@@ -298,7 +306,9 @@ def create_sample_ingredients():
         for ingredient_data in sample_ingredients:
             # Check if ingredient already exists by name
             if repository.exists_by_name(ingredient_data["name"]):
-                print(f"Ingredient '{ingredient_data['name']}' already exists, skipping...")
+                print(
+                    f"Ingredient '{ingredient_data['name']}' already exists, skipping..."
+                )
                 continue
 
             ingredient = Ingredient.create(
@@ -312,7 +322,9 @@ def create_sample_ingredients():
                 applies_to_dessert=ingredient_data["applies_to_dessert"],
             )
             saved_ingredient = repository.save(ingredient)
-            print(f"Created ingredient: {saved_ingredient.name} ({saved_ingredient.type}) - ${saved_ingredient.price}")
+            print(
+                f"Created ingredient: {saved_ingredient.name} ({saved_ingredient.type}) - ${saved_ingredient.price}"
+            )
 
         print("Sample ingredients creation completed!")
 
@@ -331,26 +343,45 @@ def create_sample_products():
 
         # Get existing ingredients to use in products
         all_ingredients = ingredient_repository.find_all()
-        
+
         # Create ingredient lookup by name for easier reference
-        ingredient_lookup = {ingredient.name.value: ingredient for ingredient in all_ingredients}
-        
+        ingredient_lookup = {
+            ingredient.name.value: ingredient for ingredient in all_ingredients
+        }
+
         # Verify all required ingredients exist
         required_ingredients = [
-            "Classic Bun", "Whole Wheat Bun", "Beef Patty", "Chicken Breast", "Veggie Patty",
-            "Cheddar Cheese", "Swiss Cheese", "Lettuce", "Tomato", "Onion", "Mixed Greens",
-            "Ketchup", "Mustard", "Mayonnaise", "Ice Cubes", "Whole Milk", "Almond Milk",
-            "Chocolate Sprinkles", "Whipped Cream"
+            "Classic Bun",
+            "Whole Wheat Bun",
+            "Beef Patty",
+            "Chicken Breast",
+            "Veggie Patty",
+            "Cheddar Cheese",
+            "Swiss Cheese",
+            "Lettuce",
+            "Tomato",
+            "Onion",
+            "Mixed Greens",
+            "Ketchup",
+            "Mustard",
+            "Mayonnaise",
+            "Ice Cubes",
+            "Whole Milk",
+            "Almond Milk",
+            "Chocolate Sprinkles",
+            "Whipped Cream",
         ]
-        
+
         missing_ingredients = []
         for ingredient_name in required_ingredients:
             if ingredient_name not in ingredient_lookup:
                 missing_ingredients.append(ingredient_name)
-        
+
         if missing_ingredients:
             print(f"Warning: Missing ingredients: {missing_ingredients}")
-            print("Please run create_sample_ingredients() first to ensure all ingredients exist.")
+            print(
+                "Please run create_sample_ingredients() first to ensure all ingredients exist."
+            )
             return
 
         # Create sample products using valid test data structure
@@ -480,9 +511,11 @@ def create_sample_products():
         for product_data in sample_products:
             # Check if product already exists by SKU
             if repository.exists_by_sku(product_data["sku"]):
-                print(f"Product with SKU {product_data['sku']} already exists, skipping...")
+                print(
+                    f"Product with SKU {product_data['sku']} already exists, skipping..."
+                )
                 continue
-                
+
             # Check if product already exists by name
             if repository.exists_by_name(product_data["name"]):
                 print(f"Product '{product_data['name']}' already exists, skipping...")
@@ -498,7 +531,9 @@ def create_sample_products():
                     is_active=product_data["is_active"],
                 )
                 saved_product = repository.save(product)
-                print(f"Created product: {saved_product.name.value} ({saved_product.category}) - ${saved_product.price}")
+                print(
+                    f"Created product: {saved_product.name.value} ({saved_product.category}) - ${saved_product.price}"
+                )
             except Exception as e:
                 print(f"Failed to create product {product_data['name']}: {e}")
                 continue
@@ -525,29 +560,39 @@ def create_sample_orders():
         customers = customer_repository.find_all()
         products = product_repository.find_all()
         ingredients = ingredient_repository.find_all()
-        
-        print(f"Found {len(customers)} customers, {len(products)} products, {len(ingredients)} ingredients")
-        
+
+        print(
+            f"Found {len(customers)} customers, {len(products)} products, {len(ingredients)} ingredients"
+        )
+
         if not customers:
-            print("Warning: No customers found. Please run create_sample_customers() first.")
+            print(
+                "Warning: No customers found. Please run create_sample_customers() first."
+            )
             return
-            
+
         if not products:
-            print("Warning: No products found. Please run create_sample_products() first.")
+            print(
+                "Warning: No products found. Please run create_sample_products() first."
+            )
             return
-            
+
         if not ingredients:
-            print("Warning: No ingredients found. Please run create_sample_ingredients() first.")
+            print(
+                "Warning: No ingredients found. Please run create_sample_ingredients() first."
+            )
             return
 
         # Create ingredient lookup by name for easier reference
-        ingredient_lookup = {ingredient.name.value: ingredient for ingredient in ingredients}
+        ingredient_lookup = {
+            ingredient.name.value: ingredient for ingredient in ingredients
+        }
         print(f"Available ingredients: {list(ingredient_lookup.keys())}")
-        
+
         # Create product lookup by name for easier reference
         product_lookup = {product.name.value: product for product in products}
         print(f"Available products: {list(product_lookup.keys())}")
-        
+
         # Define the sample orders with required products and ingredients
         sample_orders_config = [
             {
@@ -558,9 +603,9 @@ def create_sample_orders():
                     {
                         "product_name": "Classic Burger",
                         "additional_ingredients": ["Swiss Cheese", "Onion"],
-                        "remove_ingredients": ["Tomato"]
+                        "remove_ingredients": ["Tomato"],
                     }
-                ]
+                ],
             },
             {
                 "description": "Multiple Items Order",
@@ -570,19 +615,19 @@ def create_sample_orders():
                     {
                         "product_name": "Chicken Burger",
                         "additional_ingredients": ["Cheddar Cheese"],
-                        "remove_ingredients": []
+                        "remove_ingredients": [],
                     },
                     {
                         "product_name": "Milk Shake",
                         "additional_ingredients": [],
-                        "remove_ingredients": []
+                        "remove_ingredients": [],
                     },
                     {
                         "product_name": "Fresh Salad",
                         "additional_ingredients": ["Mustard"],
-                        "remove_ingredients": []
-                    }
-                ]
+                        "remove_ingredients": [],
+                    },
+                ],
             },
             {
                 "description": "Veggie Order",
@@ -592,84 +637,113 @@ def create_sample_orders():
                     {
                         "product_name": "Veggie Burger",
                         "additional_ingredients": ["Lettuce", "Onion"],
-                        "remove_ingredients": []
+                        "remove_ingredients": [],
                     },
                     {
                         "product_name": "Almond Milk Shake",
                         "additional_ingredients": [],
-                        "remove_ingredients": []
-                    }
-                ]
-            }
+                        "remove_ingredients": [],
+                    },
+                ],
+            },
         ]
-        
+
         # Validate all required products and ingredients exist
         for order_config in sample_orders_config:
-            missing_products = [name for name in order_config["required_products"] if name not in product_lookup]
+            missing_products = [
+                name
+                for name in order_config["required_products"]
+                if name not in product_lookup
+            ]
             if missing_products:
-                print(f"Warning: Missing products for {order_config['description']}: {missing_products}")
+                print(
+                    f"Warning: Missing products for {order_config['description']}: {missing_products}"
+                )
                 continue
-                
-            missing_ingredients = [name for name in order_config["required_ingredients"] if name not in ingredient_lookup]
+
+            missing_ingredients = [
+                name
+                for name in order_config["required_ingredients"]
+                if name not in ingredient_lookup
+            ]
             if missing_ingredients:
-                print(f"Warning: Missing ingredients for {order_config['description']}: {missing_ingredients}")
+                print(
+                    f"Warning: Missing ingredients for {order_config['description']}: {missing_ingredients}"
+                )
                 continue
-        
+
         # Create orders using the first available customer
         customer = customers[0]
-        print(f"Using customer: {customer.full_name} (internal_id: {customer.internal_id})")
-        
+        print(
+            f"Using customer: {customer.full_name} (internal_id: {customer.internal_id})"
+        )
+
         orders_created = 0
         for order_config in sample_orders_config:
             try:
                 # Validate this specific order can be created
-                missing_products = [name for name in order_config["required_products"] if name not in product_lookup]
-                missing_ingredients = [name for name in order_config["required_ingredients"] if name not in ingredient_lookup]
-                
+                missing_products = [
+                    name
+                    for name in order_config["required_products"]
+                    if name not in product_lookup
+                ]
+                missing_ingredients = [
+                    name
+                    for name in order_config["required_ingredients"]
+                    if name not in ingredient_lookup
+                ]
+
                 if missing_products or missing_ingredients:
-                    print(f"Skipping {order_config['description']} - missing dependencies")
+                    print(
+                        f"Skipping {order_config['description']} - missing dependencies"
+                    )
                     continue
-                
+
                 # Create order items
                 order_items = []
                 for item_config in order_config["items"]:
                     product = product_lookup[item_config["product_name"]]
-                    
+
                     # Get additional ingredients
                     additional_ingredients = []
                     for ingredient_name in item_config["additional_ingredients"]:
                         if ingredient_name in ingredient_lookup:
-                            additional_ingredients.append(ingredient_lookup[ingredient_name])
-                    
+                            additional_ingredients.append(
+                                ingredient_lookup[ingredient_name]
+                            )
+
                     # Get remove ingredients
                     remove_ingredients = []
                     for ingredient_name in item_config["remove_ingredients"]:
                         if ingredient_name in ingredient_lookup:
-                            remove_ingredients.append(ingredient_lookup[ingredient_name])
-                    
+                            remove_ingredients.append(
+                                ingredient_lookup[ingredient_name]
+                            )
+
                     # Create order item
                     order_item = OrderItem(
                         order_internal_id=0,  # Will be set when order is saved
                         product=product,
                         additional_ingredient=additional_ingredients,
-                        remove_ingredient=remove_ingredients
+                        remove_ingredient=remove_ingredients,
                     )
                     order_items.append(order_item)
 
                 # Create order
                 order = Order.create(
-                    customer_internal_id=customer.internal_id,
-                    order_items=order_items
+                    customer_internal_id=customer.internal_id, order_items=order_items
                 )
-                
+
                 # Set start date
                 order.set_start_date()
-                
+
                 # Save order
                 saved_order = repository.create(order)
-                print(f"Created order: {order_config['description']} - ${saved_order.value.value} - {saved_order.get_total_items()} items")
+                print(
+                    f"Created order: {order_config['description']} - ${saved_order.value.value} - {saved_order.get_total_items()} items"
+                )
                 orders_created += 1
-                
+
             except Exception as e:
                 print(f"Failed to create order {order_config['description']}: {e}")
                 continue
@@ -679,6 +753,7 @@ def create_sample_orders():
     except Exception as e:
         print(f"Error creating sample orders: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

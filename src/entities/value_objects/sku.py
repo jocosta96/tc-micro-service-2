@@ -31,7 +31,7 @@ class SKU:
         format_pattern = r"^[A-Za-z]+-\d{4}-[A-Za-z]{3}$"
         if not re.match(format_pattern, values):
             return False
-        
+
         return True
 
     def __str__(self) -> str:

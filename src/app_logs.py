@@ -33,11 +33,11 @@ class StructuredLogger:
         # Convert non-serializable objects to strings
         serializable_kwargs = {}
         for key, value in kwargs.items():
-            if hasattr(value, '__str__'):
+            if hasattr(value, "__str__"):
                 serializable_kwargs[key] = str(value)
             else:
                 serializable_kwargs[key] = repr(value)
-        
+
         log_entry = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": level,

@@ -22,25 +22,29 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_id(self, ingredient_internal_id: int, include_inactive: bool = False) -> Optional[Ingredient]:
+    def find_by_id(
+        self, ingredient_internal_id: int, include_inactive: bool = False
+    ) -> Optional[Ingredient]:
         """Find a ingredient by ID"""
         pass
 
     @abstractmethod
-    def find_by_name(self, name: str, include_inactive: bool = False) -> Optional[Ingredient]:
+    def find_by_name(
+        self, name: str, include_inactive: bool = False
+    ) -> Optional[Ingredient]:
         """Find a ingredient by name"""
         pass
 
     @abstractmethod
-    def find_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:
+    def find_by_type(
+        self, ingredient_type: IngredientType, include_inactive: bool = False
+    ) -> List[Ingredient]:
         """Find ingredients by type"""
         pass
 
     @abstractmethod
     def find_by_applies_usage(
-        self,
-        category: ProductCategory,
-        include_inactive: bool = False
+        self, category: ProductCategory, include_inactive: bool = False
     ) -> List[Ingredient]:
         """Find ingredients by applies_to_burger, applies_to_side, applies_to_drink and applies_to_dessert"""
         pass
@@ -61,6 +65,8 @@ class IngredientRepository(ABC):
         pass
 
     @abstractmethod
-    def exists_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:
+    def exists_by_type(
+        self, ingredient_type: IngredientType, include_inactive: bool = False
+    ) -> bool:
         """Check if an ingredient exists with the given type"""
         pass

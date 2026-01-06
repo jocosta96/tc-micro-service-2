@@ -21,7 +21,7 @@ from src.application.dto.implementation.order_dto import (
     OrderCreateRequest,
     OrderUpdateRequest,
     PaymentRequest,
-    OrderItemRequest
+    OrderItemRequest,
 )
 
 
@@ -29,17 +29,13 @@ class OrderController:
     """Controller for order-related HTTP endpoints"""
 
     def __init__(
-        self,
-        order_repository: OrderRepository,
-        presenter: PresenterInterface
+        self, order_repository: OrderRepository, presenter: PresenterInterface
     ):
         self.order_repository = order_repository
         self.presenter = presenter
 
         # Initialize use cases
-        self.create_use_case = OrderCreateUseCase(
-            order_repository
-        )
+        self.create_use_case = OrderCreateUseCase(order_repository)
         self.read_use_case = OrderReadUseCase(order_repository)
         self.update_use_case = OrderUpdateUseCase(order_repository)
         self.cancel_use_case = OrderCancelUseCase(order_repository)
@@ -59,14 +55,18 @@ class OrderController:
             for item_data in data.get("order_items", []):
                 order_item = OrderItemRequest(
                     product_internal_id=item_data["product_internal_id"],
-                    additional_ingredient_internal_ids=item_data.get("additional_ingredient_internal_ids", []),
-                    remove_ingredient_internal_ids=item_data.get("remove_ingredient_internal_ids", [])
+                    additional_ingredient_internal_ids=item_data.get(
+                        "additional_ingredient_internal_ids", []
+                    ),
+                    remove_ingredient_internal_ids=item_data.get(
+                        "remove_ingredient_internal_ids", []
+                    ),
                 )
                 order_items.append(order_item)
 
             request = OrderCreateRequest(
                 customer_internal_id=data["customer_internal_id"],
-                order_items=order_items
+                order_items=order_items,
             )
 
             result = self.create_use_case.execute(request)
@@ -98,8 +98,7 @@ class OrderController:
         """Update an order"""
         try:
             request = OrderUpdateRequest(
-                status=data.get("status"),
-                order_items=data.get("order_items")
+                status=data.get("status"), order_items=data.get("order_items")
             )
 
             result = self.update_use_case.execute(order_internal_id, request)
@@ -146,7 +145,7 @@ class OrderController:
         """Update order status"""
         try:
             # Convert OrderStatusType enum to string if needed
-            status_str = status.value if hasattr(status, 'value') else str(status)
+            status_str = status.value if hasattr(status, "value") else str(status)
             result = self.status_update_use_case.execute(order_internal_id, status_str)
             if not result:
                 raise HTTPException(status_code=404, detail="Order not found")
@@ -167,19 +166,23 @@ class OrderController:
         try:
             print(f"Processing payment data: {data}")
             print(f"Date type: {type(data.get('date'))}, Value: {data.get('date')}")
-            
+
             # Ensure date is a string before parsing
             date_str = str(data.get("date")) if data.get("date") else None
-            payment_date = datetime.fromisoformat(date_str) if date_str else datetime.now()
-            
+            payment_date = (
+                datetime.fromisoformat(date_str) if date_str else datetime.now()
+            )
+
             payment_request = PaymentRequest(
                 transaction_id=data["transaction_id"],
                 approval_status=data["approval_status"],
                 date=payment_date,
-                message=data.get("message", "")
+                message=data.get("message", ""),
             )
 
-            result = self.payment_process_use_case.execute(order_internal_id, payment_request)
+            result = self.payment_process_use_case.execute(
+                order_internal_id, payment_request
+            )
             if not result:
                 raise HTTPException(status_code=404, detail="Order not found")
 
@@ -225,8 +228,6 @@ class OrderController:
             error_response = self.presenter.present_error(e)
             raise HTTPException(status_code=500, detail=error_response)
 
-
-
     def get_orders_by_status(self, status: str) -> list:
         """Get orders by status"""
         try:
@@ -236,4 +237,4 @@ class OrderController:
 
         except Exception as e:
             error_response = self.presenter.present_error(e)
-            raise HTTPException(status_code=500, detail=error_response) 
+            raise HTTPException(status_code=500, detail=error_response)

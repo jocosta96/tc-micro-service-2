@@ -9,7 +9,7 @@ class Money:
     Money value object that represents a valid monetary amount.
 
     This is a value object because:
-    - It's mutable 
+    - It's mutable
     - It validates itself during creation
     - It has no identity, only value
     - Two money objects are equal if they have the same amount
@@ -22,7 +22,7 @@ class Money:
         # Convert float to Decimal if needed
         if isinstance(self.amount, float):
             self.amount = Decimal(str(self.amount))
-        
+
         if not self._is_valid_amount(self.amount):
             raise ValueError(f"Invalid amount: {self.amount}")
 
@@ -32,16 +32,18 @@ class Money:
         Validates the money amount:
         1. Must be non-negative
         2. Must have at most 2 decimal places
-        """            
+        """
         # Check if amount is negative
         if amount < 0:
             return False
-            
+
         normalized = amount.normalize()
-        decimal_places = -normalized.as_tuple().exponent if normalized.as_tuple().exponent < 0 else 0
+        decimal_places = (
+            -normalized.as_tuple().exponent if normalized.as_tuple().exponent < 0 else 0
+        )
         if decimal_places > 2:
             return False
-            
+
         return True
 
     def __str__(self) -> str:
@@ -60,7 +62,7 @@ class Money:
         """Formats the amount to 2 decimal places"""
         return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_EVEN)
 
-    @property 
+    @property
     def value(self) -> float:
         """Get the amount as a float"""
         return float(self._format(self.amount))
@@ -70,7 +72,3 @@ class Money:
         if isinstance(other, Decimal):
             other = Money(amount=other)
         return Money(amount=self.amount + other.amount)
-
-
-
-

@@ -20,17 +20,23 @@ class CustomerRepository(ABC):
         pass
 
     @abstractmethod
-    def find_by_id(self, customer_internal_id: int, include_inactive: bool = False) -> Optional[Customer]:
+    def find_by_id(
+        self, customer_internal_id: int, include_inactive: bool = False
+    ) -> Optional[Customer]:
         """Find a customer by internal ID"""
         pass
 
     @abstractmethod
-    def find_by_document(self, document: str, include_inactive: bool = False) -> Optional[Customer]:
+    def find_by_document(
+        self, document: str, include_inactive: bool = False
+    ) -> Optional[Customer]:
         """Find a customer by document number"""
         pass
 
     @abstractmethod
-    def find_by_email(self, email: str, include_inactive: bool = False) -> Optional[Customer]:
+    def find_by_email(
+        self, email: str, include_inactive: bool = False
+    ) -> Optional[Customer]:
         """Find a customer by email"""
         pass
 

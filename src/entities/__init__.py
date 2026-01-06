@@ -11,4 +11,16 @@ from .ingredient import Ingredient
 from .product import Product
 from .order import Order, OrderItem
 
-__all__ = ["Customer", "Email", "Name", "Document", "Money", "OrderStatus", "OrderStatusType", "Ingredient", "Product", "Order", "OrderItem"]
+__all__ = [
+    "Customer",
+    "Email",
+    "Name",
+    "Document",
+    "Money",
+    "OrderStatus",
+    "OrderStatusType",
+    "Ingredient",
+    "Product",
+    "Order",
+    "OrderItem",
+]

@@ -55,24 +55,24 @@ class Customer:
         """Business rule: Soft delete the customer by replacing data with placeholder values"""
         if not self.is_active:
             raise ValueError("Cannot soft delete inactive customer")
-        
+
         # Business rule: Cannot soft delete customer without ID
         if not self.internal_id:
             raise ValueError("Cannot soft delete customer without ID")
-            
+
         # Business rule: Cannot delete active anonymous customers
         # But allow deleting inactive anonymous customers (already soft-deleted)
         if self.is_anonymous and self.is_active:
             raise ValueError("Cannot delete anonymous customer")
-            
+
         # Business rule: Set is_active to False
         self.is_active = False
-        
+
         # Business rule: Replace data with placeholder values for privacy
         self.first_name = Name.create("Deleted")
         self.last_name = Name.create("Customer")
         self.document = Document.create("")
-        
+
         # Business rule: Soft-deleted customers get unique email but remain registered
         self.email = Email.create(f"deleted.{self.internal_id}@fastfood.local")
         # Keep is_anonymous as False - soft-deleted customers remain registered
@@ -92,7 +92,7 @@ class Customer:
         # Customer must be active to place orders
         if not self.is_active:
             return False
-            
+
         # Active anonymous customers can always place orders
         if self.is_anonymous:
             return True
@@ -134,7 +134,6 @@ class Customer:
         last_name: str,
         email: str,
         document: str,
-
         internal_id: Optional[int] = None,
         is_active: bool = True,
         created_at: Optional[datetime] = None,

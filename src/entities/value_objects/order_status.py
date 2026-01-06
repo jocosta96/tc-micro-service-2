@@ -81,7 +81,7 @@ class OrderStatus:
             OrderStatusType.RECEBIDO,
             OrderStatusType.EM_PREPARACAO,
             OrderStatusType.PRONTO,
-            OrderStatusType.FINALIZADO
+            OrderStatusType.FINALIZADO,
         ]
         try:
             current_index = flow.index(self.status)
@@ -96,7 +96,7 @@ class OrderStatus:
             OrderStatusType.RECEBIDO,
             OrderStatusType.EM_PREPARACAO,
             OrderStatusType.PRONTO,
-            OrderStatusType.FINALIZADO
+            OrderStatusType.FINALIZADO,
         ]
         try:
             current_index = flow.index(self.status)
@@ -108,4 +108,4 @@ class OrderStatus:
     @property
     def value(self) -> str:
         """Get the status value as string"""
-        return self.status.value 
+        return self.status.value

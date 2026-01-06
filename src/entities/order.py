@@ -141,15 +141,15 @@ class Order:
         """Validate domain business rules"""
         if not self.customer_internal_id:
             raise ValueError("Order must have a customer internal ID")
-        
+
         if not self.order_items:
             raise ValueError("Order must have at least one item")
-        
+
         # Business rule: All order items must have valid products
         for item in self.order_items:
             if not item.product or not item.product.is_active:
                 raise ValueError("Order items must have active products")
-        
+
         # Business rule: Order value must be positive
         if self.value and self.value.amount <= 0:
             raise ValueError("Order value must be positive")
@@ -159,7 +159,7 @@ class Order:
         if self.internal_id:
             self.order_display_id = str(self.internal_id).zfill(3)[:3]
         return self.order_display_id
-    
+
     def update_display_id(self):
         """Update the display ID after internal_id is set (usually after database save)"""
         if self.internal_id and not self.order_display_id:
@@ -205,11 +205,11 @@ class Order:
 
     def process_payment(self, payment: dict):
         """Process payment and update order status accordingly"""
-        self.payment_transaction_id = payment.get('transaction_id', '')
-        self.payment_date = payment.get('date')
-        self.payment_message = payment.get('message', '')
+        self.payment_transaction_id = payment.get("transaction_id", "")
+        self.payment_date = payment.get("date")
+        self.payment_message = payment.get("message", "")
 
-        if payment.get('approval_status', False):
+        if payment.get("approval_status", False):
             self.validate_duplicated_payment()
             self.has_payment_verified = True
             self.status = OrderStatus.em_preparacao()
@@ -233,12 +233,14 @@ class Order:
     def payment_as_dict(self) -> dict:
         """Get payment information as dictionary"""
         return {
-            "payment_date": self.payment_date.isoformat() if self.payment_date else None,
+            "payment_date": (
+                self.payment_date.isoformat() if self.payment_date else None
+            ),
             "payment_transaction_id": self.payment_transaction_id,
             "payment_message": self.payment_message,
             "has_payment_verified": self.has_payment_verified,
-            "value": self.value.amount if hasattr(self.value, 'amount') else self.value,
-            "status": str(self.status)
+            "value": self.value.amount if hasattr(self.value, "amount") else self.value,
+            "status": str(self.status),
         }
 
     def __str__(self) -> str:
@@ -253,24 +255,24 @@ class Order:
         customer_internal_id: int,
         order_items: List[OrderItem],
         internal_id: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> "Order":
         """Factory method to create an Order"""
         return cls(
             customer_internal_id=customer_internal_id,
             order_items=order_items,
             internal_id=internal_id,
-            **kwargs
+            **kwargs,
         )
 
     def _validate_business_rules_skip_active_check(self):
         """Validate business rules without checking active products (for historical data)"""
         if not self.customer_internal_id:
             raise ValueError("Order must have a customer internal ID")
-        
+
         if not self.order_items:
             raise ValueError("Order must have at least one item")
-        
+
         # Business rule: Order value must be positive
         if self.value and self.value.amount <= 0:
             raise ValueError("Order value must be positive")
@@ -284,7 +286,7 @@ class Order:
         remove_ingredients: List[List[Ingredient]] = None,
         order_internal_id: Optional[int] = None,
         internal_id: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> "Order":
         """Factory method to create an Order with products and ingredients"""
         if additional_ingredients is None:
@@ -295,10 +297,11 @@ class Order:
         order_items = []
         for i, product in enumerate(products):
             item = OrderItem(
-                order_internal_id=order_internal_id or 0,  # Will be set when order is saved
+                order_internal_id=order_internal_id
+                or 0,  # Will be set when order is saved
                 product=product,
                 additional_ingredient=additional_ingredients[i],
-                remove_ingredient=remove_ingredients[i]
+                remove_ingredient=remove_ingredients[i],
             )
             order_items.append(item)
 
@@ -306,7 +309,5 @@ class Order:
             customer_internal_id=customer_internal_id,
             order_items=order_items,
             internal_id=internal_id,
-            **kwargs
+            **kwargs,
         )
-
- 

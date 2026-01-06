@@ -14,8 +14,12 @@ from src.entities.value_objects.order_status import OrderStatusType
 # Pydantic models for request/response
 class OrderItemRequestModel(BaseModel):
     product_internal_id: int = Field(..., description="Product internal ID")
-    additional_ingredient_internal_ids: Optional[List[int]] = Field(default=[], description="Additional ingredient internal IDs")
-    remove_ingredient_internal_ids: Optional[List[int]] = Field(default=[], description="Remove ingredient internal IDs")
+    additional_ingredient_internal_ids: Optional[List[int]] = Field(
+        default=[], description="Additional ingredient internal IDs"
+    )
+    remove_ingredient_internal_ids: Optional[List[int]] = Field(
+        default=[], description="Remove ingredient internal IDs"
+    )
 
 
 class OrderCreateRequestModel(BaseModel):
@@ -45,7 +49,7 @@ class OrderItemResponseModel(BaseModel):
     product_name: str
     product_price: float
     additional_ingredients: List[int]  # These are ingredient internal IDs
-    remove_ingredients: List[int]     # These are ingredient internal IDs
+    remove_ingredients: List[int]  # These are ingredient internal IDs
     item_receipt: List[dict]
     price: float
 
@@ -113,13 +117,11 @@ def get_order_controller() -> OrderController:
     """Get order controller with dependencies"""
     container = Container()
     controller = OrderController(
-        order_repository=container.order_repository,
-        presenter=container.presenter
+        order_repository=container.order_repository, presenter=container.presenter
     )
     # injeta use case de request_payment com client HTTP externo
     controller.payment_request_use_case = OrderPaymentRequestUseCase(
-        container.order_repository,
-        container.payment_client
+        container.order_repository, container.payment_client
     )
     return controller
 
@@ -128,7 +130,7 @@ def get_order_controller() -> OrderController:
 @order_router.post("/create", response_model=OrderResponseModel, status_code=201)
 async def create_order(
     order_data: OrderCreateRequestModel,
-    controller: OrderController = Depends(get_order_controller)
+    controller: OrderController = Depends(get_order_controller),
 ):
     """Create a new order (checkout)"""
     return controller.create_order(order_data.dict())
@@ -136,8 +138,7 @@ async def create_order(
 
 @order_router.get("/by-id/{order_id}", response_model=OrderResponseModel)
 async def get_order(
-    order_id: int,
-    controller: OrderController = Depends(get_order_controller)
+    order_id: int, controller: OrderController = Depends(get_order_controller)
 ):
     """Get order by ID"""
     return controller.get_order(order_id)
@@ -147,7 +148,7 @@ async def get_order(
 async def update_order_status(
     order_id: int,
     order_data: OrderStatusUpdateRequestModel,
-    controller: OrderController = Depends(get_order_controller)
+    controller: OrderController = Depends(get_order_controller),
 ):
     """Update order status"""
     return controller.update_order_status(order_id, order_data.status)
@@ -155,8 +156,7 @@ async def update_order_status(
 
 @order_router.delete("/cancel/{order_id}", response_model=SimpleResponseModel)
 async def cancel_order(
-    order_id: int,
-    controller: OrderController = Depends(get_order_controller)
+    order_id: int, controller: OrderController = Depends(get_order_controller)
 ):
     """Cancel an order"""
     return controller.cancel_order(order_id)
@@ -165,50 +165,52 @@ async def cancel_order(
 @order_router.get("/list", response_model=OrderListResponseModel)
 async def list_orders(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return"),
-    controller: OrderController = Depends(get_order_controller)
+    limit: int = Query(
+        100, ge=1, le=1000, description="Maximum number of records to return"
+    ),
+    controller: OrderController = Depends(get_order_controller),
 ):
     """List all orders with pagination"""
     return controller.list_orders(skip=skip, limit=limit)
 
 
-
-
-
-@order_router.post("/payment_confirm/{order_id}", response_model=OrderResponseModel, include_in_schema=False)
+@order_router.post(
+    "/payment_confirm/{order_id}",
+    response_model=OrderResponseModel,
+    include_in_schema=False,
+)
 async def process_payment(
     order_id: int,
     payment_data: PaymentRequestModel,
-    controller: OrderController = Depends(get_order_controller)
+    controller: OrderController = Depends(get_order_controller),
 ):
     """Process payment for an order"""
     return controller.process_payment(order_id, payment_data.dict())
 
 
-@order_router.get("/payment_status/{order_id}", response_model=PaymentStatusResponseModel)
+@order_router.get(
+    "/payment_status/{order_id}", response_model=PaymentStatusResponseModel
+)
 async def get_payment_status(
-    order_id: int,
-    controller: OrderController = Depends(get_order_controller)
+    order_id: int, controller: OrderController = Depends(get_order_controller)
 ):
     """Get payment status for an order"""
     return controller.get_payment_status(order_id)
 
 
-@order_router.post("/request-payment/{order_id}", response_model=PaymentRequestResponseModel)
+@order_router.post(
+    "/request-payment/{order_id}", response_model=PaymentRequestResponseModel
+)
 async def request_payment(
-    order_id: int,
-    controller: OrderController = Depends(get_order_controller)
+    order_id: int, controller: OrderController = Depends(get_order_controller)
 ):
     """Initiate payment via payment-service"""
     return controller.request_payment(order_id)
 
 
-
-
 @order_router.get("/status/{status}", response_model=List[OrderResponseModel])
 async def get_orders_by_status(
-    status: OrderStatusType,
-    controller: OrderController = Depends(get_order_controller)
+    status: OrderStatusType, controller: OrderController = Depends(get_order_controller)
 ):
     """Get orders by status"""
-    return controller.get_orders_by_status(status.value) 
+    return controller.get_orders_by_status(status.value)

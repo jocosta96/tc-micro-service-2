@@ -4,6 +4,7 @@ from datetime import datetime
 from src.application.dto.interfaces.request_interface import RequestInterface
 from src.application.dto.interfaces.response_interface import ResponseInterface
 
+
 @dataclass
 class CustomerCreateRequest(RequestInterface):
     """DTO for customer creation request"""
@@ -20,6 +21,7 @@ class CustomerCreateRequest(RequestInterface):
             "email": self.email,
             "document": self.document,
         }
+
 
 @dataclass
 class CustomerUpdateRequest(RequestInterface):
@@ -56,7 +58,7 @@ class CustomerResponse(ResponseInterface):
     is_registered: bool
     is_active: bool
     created_at: Optional[datetime]
-    
+
     @classmethod
     def from_entity(cls, customer):
         """Create DTO from Customer entity"""
@@ -97,6 +99,7 @@ class CustomerListResponse(ResponseInterface):
 
     def to_dict(self):
         from datetime import datetime
+
         return {
             "data": [customer.to_dict() for customer in self.customers],
             "total_count": self.total_count,
@@ -107,6 +110,8 @@ class CustomerListResponse(ResponseInterface):
     def from_entity(cls, entity: Any) -> "CustomerListResponse":
         """Create DTO from entity"""
         return cls(
-            customers=[CustomerResponse.from_entity(customer) for customer in entity.customers],
+            customers=[
+                CustomerResponse.from_entity(customer) for customer in entity.customers
+            ],
             total_count=entity.total_count,
         )

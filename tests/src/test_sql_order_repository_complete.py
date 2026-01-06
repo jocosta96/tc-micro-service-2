@@ -2,10 +2,15 @@
 Comprehensive tests for SQLOrderRepository to increase coverage.
 Focuses on get_by_id, list_all, update, cancel, update_status, process_payment, find_by_status.
 """
+
 from unittest.mock import MagicMock, patch, PropertyMock
 from datetime import datetime
 
-from src.adapters.gateways.sql_order_repository import SQLOrderRepository, OrderModel, OrderItemModel
+from src.adapters.gateways.sql_order_repository import (
+    SQLOrderRepository,
+    OrderModel,
+    OrderItemModel,
+)
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product, ProductCategory
 from src.entities.ingredient import Ingredient, IngredientType
@@ -31,7 +36,7 @@ def create_mock_order_model(internal_id=1, status="RECEBIDO"):
     order_model.payment_transaction_id = None
     order_model.payment_message = None
     order_model.order_display_id = "001"
-    
+
     # Create mock order item
     item_model = MagicMock(spec=OrderItemModel)
     item_model.internal_id = 1
@@ -40,7 +45,7 @@ def create_mock_order_model(internal_id=1, status="RECEBIDO"):
     item_model.remove_ingredient_internal_ids = []
     item_model.item_receipt = []
     item_model.price = 50.0
-    
+
     order_model.order_items = [item_model]
     return order_model
 
@@ -48,18 +53,20 @@ def create_mock_order_model(internal_id=1, status="RECEBIDO"):
 def create_mock_product(internal_id=1):
     """Factory to create Product entity"""
     from src.entities.product import ProductReceiptItem
-    
+
     # Create ingredient for product
     ingredient = create_mock_ingredient(internal_id=1)
-    
+
     return Product(
         name=Name.create("Test Product"),
         price=Money(amount=10.0),
         is_active=True,
-        default_ingredient=[ProductReceiptItem(ingredient, 1)],  # At least one ingredient required
+        default_ingredient=[
+            ProductReceiptItem(ingredient, 1)
+        ],  # At least one ingredient required
         category=ProductCategory.BURGER,
         sku=SKU.create("P-1234-ABC"),  # Valid SKU format: Letter-4digits-3letters
-        internal_id=internal_id
+        internal_id=internal_id,
     )
 
 
@@ -74,7 +81,7 @@ def create_mock_ingredient(internal_id=1):
         applies_to_side=False,
         applies_to_drink=False,
         applies_to_dessert=False,
-        internal_id=internal_id
+        internal_id=internal_id,
     )
 
 
@@ -84,25 +91,25 @@ def test_get_by_id_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1)
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.get_by_id(1)
-    
+
     # Assert
     assert result is not None
     assert result.internal_id == 1
@@ -115,18 +122,18 @@ def test_get_by_id_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.get_by_id(999)
-    
+
     # Assert
     assert result is None
 
@@ -137,29 +144,29 @@ def test_list_all_with_pagination():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_models = [
         create_mock_order_model(internal_id=1),
         create_mock_order_model(internal_id=2),
-        create_mock_order_model(internal_id=3)
+        create_mock_order_model(internal_id=3),
     ]
-    
+
     mock_query = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.offset.return_value = mock_query
     mock_query.limit.return_value = mock_query
     mock_query.all.return_value = order_models
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.list_all(skip=0, limit=10)
-    
+
     # Assert
     assert len(result) == 3
     mock_query.offset.assert_called_once_with(0)
@@ -172,28 +179,28 @@ def test_find_by_status_filters_correctly():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_models = [
         create_mock_order_model(internal_id=1, status="RECEBIDO"),
-        create_mock_order_model(internal_id=2, status="RECEBIDO")
+        create_mock_order_model(internal_id=2, status="RECEBIDO"),
     ]
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.all.return_value = order_models
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.get_by_status("RECEBIDO")
-    
+
     # Assert
     assert len(result) == 2
     assert all(order.status.value == "RECEBIDO" for order in result)
@@ -205,43 +212,43 @@ def test_update_order_success():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1)
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     # Create order entity with valid order items
     product = create_mock_product()
     order_item = OrderItem(
         order_internal_id=1,
         product=product,
         additional_ingredient=[],
-        remove_ingredient=[]
+        remove_ingredient=[],
     )
-    
+
     order = Order(
         customer_internal_id=1,
         order_items=[order_item],
         value=Money(amount=60.0),
         status=OrderStatus.create("EM_PREPARACAO"),
         internal_id=1,
-        _skip_active_validation=True
+        _skip_active_validation=True,
     )
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.update(order)
-    
+
     # Assert
     assert result is not None
     assert order_model.value == 60.0
@@ -255,33 +262,33 @@ def test_update_order_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     # Create valid order with items using correct OrderItem signature
     product = create_mock_product()
     order_item = OrderItem(
         order_internal_id=999,
         product=product,
         additional_ingredient=[],
-        remove_ingredient=[]
+        remove_ingredient=[],
     )
-    
+
     order = Order(
         customer_internal_id=1,
         order_items=[order_item],
         value=Money(amount=50.0),
         status=OrderStatus.create("RECEBIDO"),
         internal_id=999,
-        _skip_active_validation=True
+        _skip_active_validation=True,
     )
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act & Assert
     try:
         repo.update(order)
@@ -296,20 +303,20 @@ def test_cancel_order_success():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     order_model = create_mock_order_model(internal_id=1, status="RECEBIDO")
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.cancel(1)
-    
+
     # Assert
     assert result is True
     assert order_model.status == OrderStatusType.CANCELADO.value
@@ -322,18 +329,18 @@ def test_cancel_order_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.cancel(999)
-    
+
     # Assert
     assert result is False
 
@@ -344,25 +351,25 @@ def test_update_status_success():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1, status="RECEBIDO")
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.update_status(1, "EM_PREPARACAO")
-    
+
     # Assert
     assert result is not None
     assert order_model.status == "EM_PREPARACAO"
@@ -376,18 +383,18 @@ def test_update_status_order_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.update_status(999, "EM_PREPARACAO")
-    
+
     # Assert
     assert result is None
 
@@ -398,32 +405,32 @@ def test_process_payment_approved():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1, status="RECEBIDO")
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     payment_data = {
         "transaction_id": "TXN123",
         "date": datetime.now(),
         "message": "Payment approved",
-        "approval_status": True
+        "approval_status": True,
     }
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.process_payment(1, payment_data)
-    
+
     # Assert
     assert result is not None
     assert order_model.has_payment_verified is True
@@ -438,32 +445,32 @@ def test_process_payment_rejected():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_product_repo = MagicMock()
     mock_ingredient_repo = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1, status="RECEBIDO")
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     mock_product_repo.find_by_id.return_value = create_mock_product()
-    
+
     payment_data = {
         "transaction_id": "TXN456",
         "date": datetime.now(),
         "message": "Payment rejected",
-        "approval_status": False
+        "approval_status": False,
     }
-    
+
     repo = SQLOrderRepository(mock_db, mock_product_repo, mock_ingredient_repo)
-    
+
     # Act
     result = repo.process_payment(1, payment_data)
-    
+
     # Assert
     assert result is not None
     assert order_model.has_payment_verified is False
@@ -477,20 +484,20 @@ def test_process_payment_order_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     payment_data = {"transaction_id": "TXN789", "approval_status": True}
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.process_payment(999, payment_data)
-    
+
     # Assert
     assert result is None
 
@@ -501,24 +508,24 @@ def test_get_payment_status_success():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     order_model = create_mock_order_model(internal_id=1)
     order_model.payment_transaction_id = "TXN123"
     order_model.has_payment_verified = True
     order_model.payment_date = datetime(2026, 1, 6, 10, 0, 0)
     order_model.payment_message = "Approved"
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = order_model
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.get_payment_status(1)
-    
+
     # Assert
     assert result is not None
     assert result["payment_transaction_id"] == "TXN123"
@@ -532,18 +539,18 @@ def test_get_payment_status_order_not_found():
     mock_db = MagicMock()
     mock_session = MagicMock()
     mock_db.get_session.return_value.__enter__.return_value = mock_session
-    
+
     mock_query = MagicMock()
     mock_filter = MagicMock()
     mock_session.query.return_value = mock_query
     mock_query.filter.return_value = mock_filter
     mock_filter.first.return_value = None
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act
     result = repo.get_payment_status(999)
-    
+
     # Assert
     assert result is None
 
@@ -552,9 +559,9 @@ def test_to_entity_without_product_repository_raises_error():
     """Given order model with items but no product_repository, when _to_entity is called, then ValueError is raised"""
     # Arrange
     mock_db = MagicMock()
-    
+
     order_model = create_mock_order_model(internal_id=1)
-    
+
     # Add order item
     item_model = MagicMock(spec=OrderItemModel)
     item_model.internal_id = 1
@@ -564,9 +571,9 @@ def test_to_entity_without_product_repository_raises_error():
     item_model.item_receipt = []
     item_model.price = 10.0
     order_model.order_items = [item_model]
-    
+
     repo = SQLOrderRepository(mock_db, product_repository=None)
-    
+
     # Act & Assert
     try:
         repo._to_entity(order_model)
@@ -580,23 +587,23 @@ def test_serialize_and_deserialize_ingredient_internal_ids():
     # Arrange
     mock_db = MagicMock()
     mock_session = MagicMock()
-    
+
     ingredients = [
         create_mock_ingredient(internal_id=1),
-        create_mock_ingredient(internal_id=2)
+        create_mock_ingredient(internal_id=2),
     ]
-    
+
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act - Serialize
     serialized = repo._serialize_ingredient_internal_ids(ingredients, mock_session)
-    
+
     # Assert - Serialize
     assert serialized == [1, 2]
-    
+
     # Act - Deserialize
     deserialized = repo._deserialize_ingredient_internal_ids(serialized)
-    
+
     # Assert - Deserialize
     assert deserialized == [1, 2]
 
@@ -606,7 +613,7 @@ def test_deserialize_ingredient_internal_ids_handles_none():
     # Arrange
     mock_db = MagicMock()
     repo = SQLOrderRepository(mock_db)
-    
+
     # Act & Assert
     assert repo._deserialize_ingredient_internal_ids(None) == []
     assert repo._deserialize_ingredient_internal_ids([]) == []
