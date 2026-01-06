@@ -4,8 +4,6 @@ Tests engine creation, table operations, and health checks.
 """
 
 from unittest.mock import MagicMock, patch
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import declarative_base
 
 from src.config.database import DatabaseConfig
 

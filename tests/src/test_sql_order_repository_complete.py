@@ -3,7 +3,7 @@ Comprehensive tests for SQLOrderRepository to increase coverage.
 Focuses on get_by_id, list_all, update, cancel, update_status, process_payment, find_by_status.
 """
 
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock
 from datetime import datetime
 
 from src.adapters.gateways.sql_order_repository import (
@@ -18,8 +18,6 @@ from src.entities.value_objects.money import Money
 from src.entities.value_objects.order_status import OrderStatus, OrderStatusType
 from src.entities.value_objects.name import Name
 from src.entities.value_objects.sku import SKU
-from src.entities.value_objects.document import Document
-from src.entities.value_objects.email import Email
 
 
 def create_mock_order_model(internal_id=1, status="RECEBIDO"):

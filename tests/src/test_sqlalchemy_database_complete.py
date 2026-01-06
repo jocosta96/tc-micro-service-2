@@ -3,7 +3,7 @@ Comprehensive tests for SQLAlchemyDatabase to increase coverage.
 Focuses on error handling, edge cases, and all CRUD operations.
 """
 
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, PropertyMock
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 

@@ -191,6 +191,7 @@ def test_find_by_id_with_include_inactive(mock_requests_get, ingredient_repo):
 
     result = ingredient_repo.find_by_id(2, include_inactive=True)
 
+    assert result is not None
     # Verify include_inactive=true is in URL
     call_url = mock_requests_get.call_args[0][0]
     assert "include_inactive=true" in call_url

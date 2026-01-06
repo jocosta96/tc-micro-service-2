@@ -315,7 +315,7 @@ def create_sample_ingredients():
                 name=ingredient_data["name"],
                 price=ingredient_data["price"],
                 is_active=ingredient_data["is_active"],
-                type=ingredient_data["type"],
+                ingredient_type=ingredient_data["type"],
                 applies_to_burger=ingredient_data["applies_to_burger"],
                 applies_to_side=ingredient_data["applies_to_side"],
                 applies_to_drink=ingredient_data["applies_to_drink"],

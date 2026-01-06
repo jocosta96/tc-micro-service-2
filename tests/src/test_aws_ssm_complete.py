@@ -346,8 +346,6 @@ def test_get_ssm_client_singleton(mock_boto_client):
 
 def test_create_ssm_client_with_global_credentials():
     """Given global credentials set, when creating SSM client, then uses global credentials"""
-    from src.config import aws_ssm
-
     set_aws_credentials("AKIATEST", "secret123", "token456")
 
     with patch("boto3.client") as mock_client:
@@ -355,6 +353,8 @@ def test_create_ssm_client_with_global_credentials():
 
         ssm = SSMParameterStore()
 
+        # Verify SSM client was created
+        assert ssm.ssm_client is not None
         # Verify boto3.client was called with credentials
         mock_client.assert_called()
         call_kwargs = mock_client.call_args[1]
