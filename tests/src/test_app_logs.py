@@ -1,4 +1,3 @@
-import pytest
 from src.app_logs import StructuredLogger, LogLevels, configure_logging, get_logger
 
 def test_structured_logger_info_and_format():

@@ -1,4 +1,3 @@
-import pytest
 from src.application import exceptions
 
 def test_custom_exceptions_str_repr():

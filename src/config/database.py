@@ -149,8 +149,10 @@ class DatabaseConfig:
                 health["ssm_available"] = self._ssm_client.health_check()
                 if health["ssm_available"]:
                     health["configuration_source"] = "ssm_parameter_store"
-            except Exception:
-                pass
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"SSM health check failed: {e}")
+                health["ssm_available"] = False
         
         return health
 

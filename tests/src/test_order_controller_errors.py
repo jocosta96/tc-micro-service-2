@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
 from src.adapters.controllers.order_controller import OrderController
-from src.application.dto.implementation.order_dto import OrderUpdateRequest
 from fastapi import HTTPException
 
 class DummyPresenter:

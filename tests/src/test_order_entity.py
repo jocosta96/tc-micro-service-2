@@ -3,7 +3,6 @@ from src.entities.order import Order, OrderItem
 from src.entities.product import Product
 from src.entities.ingredient import Ingredient
 from src.entities.value_objects.money import Money
-from src.entities.value_objects.order_status import OrderStatus
 from datetime import datetime
 
 from src.entities.value_objects.name import Name

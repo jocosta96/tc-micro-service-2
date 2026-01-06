@@ -1,4 +1,3 @@
-import pytest
 from src.application.dto.implementation.order_dto import (
     OrderItemRequest, OrderCreateRequest, OrderUpdateRequest, PaymentRequest,
     PaymentRequestResponse, OrderItemResponse, OrderResponse, OrderListResponse, PaymentStatusResponse

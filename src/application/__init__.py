@@ -31,6 +31,7 @@ __all__ = [
     "OrderStatusUpdateUseCase",
     "OrderPaymentProcessUseCase",
     "OrderPaymentStatusUseCase",
+    "OrderPaymentRequestUseCase",
     "OrderByStatusUseCase",
     "OrderRepository",
     "OrderCreateRequest",

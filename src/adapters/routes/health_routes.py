@@ -1,6 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing_extensions import Annotated
 from src.adapters.di.container import container
 from src.config.database import db_config
 from src.config.aws_ssm import set_aws_credentials, get_aws_credentials_status, clear_aws_credentials

@@ -1,5 +1,4 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from src.adapters.gateways.http_ingredient_repository import HTTPIngredientRepository
 
 class TestHTTPIngredientRepository:

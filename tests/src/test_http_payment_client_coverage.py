@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from src.adapters.gateways.http_payment_client import HTTPPaymentClient
 
 class TestHTTPPaymentClient:

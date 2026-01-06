@@ -1,4 +1,3 @@
-import pytest
 from src.entities.order import OrderItem
 from src.entities.product import Product, ProductCategory, ProductReceiptItem
 from src.entities.ingredient import Ingredient, IngredientType

@@ -1,5 +1,3 @@
-import pytest
-from unittest.mock import MagicMock
 from src.application.repositories.order_repository import OrderRepository
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product, ProductCategory, ProductReceiptItem

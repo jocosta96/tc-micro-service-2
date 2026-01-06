@@ -1,4 +1,3 @@
-import pytest
 from src.entities.product import Product, ProductCategory, ProductReceiptItem
 from src.entities.ingredient import Ingredient, IngredientType
 from src.entities.value_objects.money import Money

@@ -1,4 +1,3 @@
-import pytest
 from src.adapters.presenters.implementations.json_presenter import JSONPresenter
 from src.application.dto.implementation.order_dto import OrderResponse
 from src.entities.order import Order, OrderItem
@@ -7,7 +6,6 @@ from src.entities.ingredient import Ingredient, IngredientType
 from src.entities.value_objects.money import Money
 from src.entities.value_objects.name import Name
 from src.entities.value_objects.sku import SKU
-from datetime import datetime
 
 class DummyError(Exception):
     pass

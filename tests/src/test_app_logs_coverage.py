@@ -1,7 +1,5 @@
-import pytest
 from src import app_logs
 
-import sys
 import logging
 from io import StringIO
 

@@ -208,7 +208,7 @@ class OrderListResponse(ResponseInterface):
         }
 
     @classmethod
-    def from_entity(cls, orders: List[Order], skip: int, limit: int) -> "OrderListResponse":
+    def from_entity(cls, orders: List[Order], skip: int = 0, limit: int = 100) -> "OrderListResponse":
         """Convert list of Order entities to OrderListResponse DTO"""
         return cls(
             orders=[OrderResponse.from_entity(order) for order in orders],

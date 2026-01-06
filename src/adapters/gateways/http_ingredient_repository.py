@@ -19,7 +19,8 @@ class HTTPIngredientRepository(IngredientRepository):
         if not self.base_url:
             raise ValueError("CATALOG_API_HOST is not configured")
 
-        url = f"http://{self.base_url}{path}"
+        # Use HTTPS for secure communication. Set CATALOG_API_HOST without protocol.
+        url = f"https://{self.base_url}{path}"
         try:
             resp = requests.get(url, timeout=self.timeout)
         except Exception as exc:
@@ -44,7 +45,7 @@ class HTTPIngredientRepository(IngredientRepository):
     def find_by_name(self, name: str, include_inactive: bool = False) -> Optional[Ingredient]:  # pragma: no cover
         raise NotImplementedError()
 
-    def find_by_type(self, type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:  # pragma: no cover
+    def find_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> List[Ingredient]:  # pragma: no cover
         raise NotImplementedError()
 
     def find_by_applies_usage(
@@ -63,5 +64,5 @@ class HTTPIngredientRepository(IngredientRepository):
     def exists_by_name(self, name: str, include_inactive: bool = False) -> bool:  # pragma: no cover
         raise NotImplementedError()
 
-    def exists_by_type(self, type: IngredientType, include_inactive: bool = False) -> bool:  # pragma: no cover
+    def exists_by_type(self, ingredient_type: IngredientType, include_inactive: bool = False) -> bool:  # pragma: no cover
         raise NotImplementedError()

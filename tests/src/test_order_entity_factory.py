@@ -1,4 +1,3 @@
-import pytest
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product, ProductCategory, ProductReceiptItem
 from src.entities.ingredient import Ingredient, IngredientType
@@ -6,7 +5,6 @@ from src.entities.value_objects.money import Money
 from src.entities.value_objects.name import Name
 from src.entities.value_objects.sku import SKU
 from src.entities.value_objects.order_status import OrderStatus
-from datetime import datetime
 
 def make_dummy_product():
     dummy_ing = Ingredient(

@@ -15,7 +15,8 @@ class HTTPPaymentClient:
         if not self.base_url:
             raise ValueError("PAYMENT_API_HOST is not configured")
 
-        url = f"http://{self.base_url}/payment/request/{order_id}"
+        # Use HTTPS for secure communication. Set PAYMENT_API_HOST without protocol.
+        url = f"https://{self.base_url}/payment/request/{order_id}"
         try:
             resp = requests.post(url, json={"amount": amount}, timeout=self.timeout)
         except Exception as exc:

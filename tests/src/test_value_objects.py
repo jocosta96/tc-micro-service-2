@@ -7,7 +7,6 @@ from src.entities.value_objects.order_status import OrderStatus, OrderStatusType
 def test_money_str_repr_add():
     m1 = Money(amount=10.0)
     m2 = Money(amount=5.0)
-    s = str(m1)
     r = repr(m1)
     assert 'Money' in r
     m3 = m1 + m2

@@ -1,4 +1,3 @@
-import pytest
 from src.application.dto.implementation.order_dto import OrderItemRequest
 from src.application.dto.implementation.order_dto import OrderCreateRequest
 from src.application.dto.implementation.order_dto import OrderUpdateRequest

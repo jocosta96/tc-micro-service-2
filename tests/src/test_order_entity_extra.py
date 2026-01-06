@@ -5,7 +5,6 @@ from src.entities.ingredient import Ingredient, IngredientType
 from src.entities.value_objects.money import Money
 from src.entities.value_objects.name import Name
 from src.entities.value_objects.sku import SKU
-from datetime import datetime
 
 # --- Fase 1: Fluxos de erro e borda ---
 def make_dummy_product():

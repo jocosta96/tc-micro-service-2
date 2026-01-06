@@ -11,7 +11,6 @@ from src.entities.order import Order, OrderItem
 from src.entities.product import Product
 from src.entities.ingredient import Ingredient
 from src.entities.value_objects.money import Money
-from src.entities.value_objects.order_status import OrderStatus
 from datetime import datetime
 
 from src.entities.value_objects.name import Name
@@ -144,7 +143,6 @@ def test_order_by_status_use_case():
     assert resp[0].internal_id == order.internal_id
 
 def test_order_create_use_case_happy(monkeypatch):
-    from src.entities.order import Order, OrderItem
     repo = MagicMock()
     use_case = OrderCreateUseCase(repo)
     # Patch _fetch_catalog to return valid customer/product/ingredient
@@ -164,7 +162,6 @@ def test_order_create_use_case_happy(monkeypatch):
             from src.entities.value_objects.name import Name
             from src.entities.value_objects.money import Money
             from src.entities.ingredient import Ingredient
-            from src.entities.value_objects.sku import SKU
             dummy_ing = Ingredient(
                 name=Name.create('Queijo'),
                 price=Money(amount=1.0),

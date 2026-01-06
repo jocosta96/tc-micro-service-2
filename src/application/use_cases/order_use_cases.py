@@ -36,7 +36,8 @@ class OrderCreateUseCase:
         if not host:
             raise ValueError("CATALOG_API_HOST is not configured")
 
-        url = f"http://{host}{path}"
+        # Use HTTPS for secure communication. Set CATALOG_API_HOST without protocol.
+        url = f"https://{host}{path}"
         try:
             response = get(url, timeout=5)
         except Exception as exc:

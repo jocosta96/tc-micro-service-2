@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from src.adapters.controllers.order_controller import OrderController
 from src.application.repositories.order_repository import OrderRepository
 from src.adapters.presenters.interfaces.presenter_interface import PresenterInterface
-from src.application.dto.implementation.order_dto import OrderCreateRequest, OrderItemRequest, PaymentRequest
+from src.application.dto.implementation.order_dto import OrderItemRequest, PaymentRequest
 from datetime import datetime
 
 class DummyPresenter(PresenterInterface):
@@ -58,7 +58,6 @@ def make_controller():
                     from src.entities.value_objects.name import Name
                     from src.entities.value_objects.money import Money
                     from src.entities.ingredient import Ingredient
-                    from src.entities.value_objects.sku import SKU
                     dummy_ing = Ingredient(
                         name=Name.create('Queijo'),
                         price=Money(amount=1.0),

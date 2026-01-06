@@ -1,4 +1,3 @@
-import pytest
 from src.config.database import DatabaseConfig
 
 def test_database_config_str_and_health():
