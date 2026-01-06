@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from src.adapters.controllers.order_controller import OrderController
 from src.application.repositories.order_repository import OrderRepository
 from src.adapters.presenters.interfaces.presenter_interface import PresenterInterface
-from src.application.dto.implementation.order_dto import OrderItemRequest, PaymentRequest
+from src.application.dto.implementation.order_dto import PaymentRequest
 from datetime import datetime
 
 class DummyPresenter(PresenterInterface):

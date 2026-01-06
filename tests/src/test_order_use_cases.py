@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from src.application.use_cases.order_use_cases import (
     OrderCreateUseCase, OrderReadUseCase, OrderUpdateUseCase, OrderCancelUseCase,
     OrderStatusUpdateUseCase, OrderPaymentProcessUseCase, OrderPaymentStatusUseCase, OrderPaymentRequestUseCase, OrderByStatusUseCase
