@@ -378,6 +378,7 @@ def test_create_ssm_client_with_env_credentials():
 
             # Should call boto3.client
             mock_client.assert_called()
+            assert ssm.ssm_client is not None
 
 
 def test_create_ssm_client_with_default_credentials():
