@@ -67,7 +67,7 @@ def test_database_config_default_values():
 
             assert config.host == "localhost"
             assert config.port == 5432
-            assert config.database == "fastfood"
+            assert config.database == "ordering_system"
             assert config.username == "postgres"
 
 
@@ -110,12 +110,12 @@ def test_reload_from_ssm_success():
     """Given SSM client available, when reload_from_ssm is called, then config is reloaded and True returned"""
     mock_ssm = MagicMock()
     mock_ssm.get_parameter.side_effect = lambda param, decrypt: {
-        "/fastfood/database/host": "newhost",
-        "/fastfood/database/port": "5434",
-        "/fastfood/database/database": "newdb",
-        "/fastfood/database/username": "newuser",
-        "/fastfood/database/password": "newpass",
-        "/fastfood/database/driver": "postgresql",
+        "/ordering-system/order/database/host": "newhost",
+        "/ordering-system/order/database/port": "5434",
+        "/ordering-system/order/database/database": "newdb",
+        "/ordering-system/order/database/username": "newuser",
+        "/ordering-system/order/database/password": "newpass",
+        "/ordering-system/order/database/driver": "postgresql",
     }.get(param)
 
     with patch("src.config.aws_ssm.get_ssm_client", return_value=mock_ssm):
@@ -175,12 +175,12 @@ def test_get_config_value_priority_ssm_over_env():
     # Mock SSM to return values for all database parameters
     def mock_get_param(param, decrypt=False):
         param_map = {
-            "/fastfood/database/host": "ssm_host",
-            "/fastfood/database/port": "5433",
-            "/fastfood/database/database": "ssm_db",
-            "/fastfood/database/username": "ssm_user",
-            "/fastfood/database/password": "ssm_pass",
-            "/fastfood/database/driver": "postgresql",
+            "/ordering-system/order/database/host": "ssm_host",
+            "/ordering-system/order/database/port": "5433",
+            "/ordering-system/order/database/database": "ssm_db",
+            "/ordering-system/order/database/username": "ssm_user",
+            "/ordering-system/order/database/password": "ssm_pass",
+            "/ordering-system/order/database/driver": "postgresql",
         }
         return param_map.get(param)
 

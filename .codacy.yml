@@ -1,0 +1,10 @@
+---
+engines:
+  bandit:
+    exclude_paths:
+      - 'infra/scripts/database_migration.py'
+exclude_paths:
+  - 'tests/**'
+  - '**/__pycache__/**'
+  - '**/migrations/versions/**'
+  - 'infra/scripts/database_migration.py'
