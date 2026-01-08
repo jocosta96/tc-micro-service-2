@@ -44,8 +44,8 @@ class OrderItemModel(Base):
         Integer, ForeignKey("orders.internal_id"), nullable=False
     )
     product_internal_id = Column(
-        Integer, ForeignKey("products.internal_id"), nullable=False
-    )
+        Integer, nullable=False
+    )  # Reference to product in external service
     additional_ingredient_internal_ids = Column(
         JSONB, nullable=True
     )  # JSON array of internal_ids
@@ -57,7 +57,6 @@ class OrderItemModel(Base):
 
     # Relationships
     order = relationship("OrderModel", back_populates="order_items")
-    product = relationship("ProductModel")
 
 
 class OrderModel(Base):
@@ -67,8 +66,8 @@ class OrderModel(Base):
 
     internal_id = Column(Integer, primary_key=True, autoincrement=True)
     customer_internal_id = Column(
-        Integer, ForeignKey("customers.internal_id"), nullable=False
-    )
+        Integer, nullable=False
+    )  # Reference to customer in external service
     value = Column(Float, nullable=False, default=0.0)
     status = Column(String(20), nullable=False, default="RECEBIDO")
     start_date = Column(DateTime, nullable=True)
@@ -80,7 +79,6 @@ class OrderModel(Base):
     order_display_id = Column(String(10), nullable=True)
 
     # Relationships
-    customer = relationship("CustomerModel")
     order_items = relationship(
         "OrderItemModel", back_populates="order", cascade="all, delete-orphan"
     )

@@ -29,7 +29,7 @@ class DatabaseConfig:
             use_ssm and os.getenv("USE_SSM_PARAMETERS", "true").lower() == "true"
         )
         self.ssm_prefix = ssm_prefix or os.getenv(
-            "SSM_PARAMETER_PREFIX", "/fastfood/database/"
+            "SSM_PARAMETER_PREFIX", "/ordering-system/order/database/"
         )
 
         # Initialize SSM client if needed
@@ -49,7 +49,7 @@ class DatabaseConfig:
         # Load configuration
         self.host = self._get_config_value("host", "POSTGRES_HOST", "localhost")
         self.port = int(self._get_config_value("port", "POSTGRES_PORT", "5432"))
-        self.database = self._get_config_value("database", "POSTGRES_DB", "fastfood")
+        self.database = self._get_config_value("database", "POSTGRES_DB", "ordering_system")
         self.username = self._get_config_value("username", "POSTGRES_USER", "postgres")
         self.password = self._get_config_value(
             "password", "POSTGRES_PASSWORD", "password123"
@@ -114,7 +114,7 @@ class DatabaseConfig:
             self.host = self._get_config_value("host", "POSTGRES_HOST", "localhost")
             self.port = int(self._get_config_value("port", "POSTGRES_PORT", "5432"))
             self.database = self._get_config_value(
-                "database", "POSTGRES_DB", "fastfood"
+                "database", "POSTGRES_DB", "ordering_system"
             )
             self.username = self._get_config_value(
                 "username", "POSTGRES_USER", "postgres"

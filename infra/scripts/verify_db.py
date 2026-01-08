@@ -8,9 +8,9 @@ import sys
 import subprocess  # nosec
 from pathlib import Path
 
-# Add the parent directory to Python path for imports
-src_path = Path(__file__).parent.parent
-sys.path.insert(0, str(src_path))
+# Add the project root directory to Python path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.adapters.di.container import container  # noqa: E402
 
