@@ -78,7 +78,7 @@ class HTTPProductRepository(ProductRepository):
         
         # Infer applies_to from type if missing
         if "applies_to_burger" not in mapped:
-            ingredient_type = mapped.get("type", "")
+            ingredient_type = str(mapped.get("type", "")).lower()
             mapped["applies_to_burger"] = ingredient_type in ["bread", "meat", "cheese", "vegetable", "salad", "sauce"]
             mapped["applies_to_side"] = ingredient_type in ["salad", "sauce", "vegetable"]
             mapped["applies_to_drink"] = ingredient_type in ["ice", "milk"]
