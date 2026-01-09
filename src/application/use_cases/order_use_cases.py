@@ -14,9 +14,12 @@ from src.application.dto.implementation.order_dto import (
 )
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product
-from src.entities.ingredient import Ingredient
+from src.entities.ingredient import Ingredient, IngredientType
+from src.config.aws_ssm import get_ssm_client
 
 from src.entities.value_objects.order_status import OrderStatus
+from src.entities.value_objects.name import Name
+from src.entities.value_objects.money import Money
 
 from requests import get
 
@@ -32,14 +35,31 @@ class OrderCreateUseCase:
 
     def _fetch_catalog(self, path: str):
         """Fetch a resource from catalog service with basic validation"""
-        host = os.getenv("CATALOG_API_HOST")
+
+        host = get_ssm_client().get_parameter(
+            "/ordering-system/catalog/apigateway/url",
+            decrypt=True
+        )  or \
+        os.getenv("CATALOG_API_HOST")
+
+        token = get_ssm_client().get_parameter(
+            "/ordering-system/catalog/apigateway/token",
+            decrypt=True
+        )  or \
+        os.getenv("CATALOG_API_TOKEN")
+
+
         if not host:
             raise ValueError("CATALOG_API_HOST is not configured")
 
-        # Use HTTPS for secure communication. Set CATALOG_API_HOST without protocol.
-        url = f"https://{host}{path}"
+        # Use HTTP for local development. Set CATALOG_API_HOST without protocol.
+        url = f"{host}{path}"
         try:
-            response = get(url, timeout=5)
+            response = get(
+                url, 
+                timeout=5,
+                headers={"Authorization": f"{token}"} if token else {}
+            )
         except Exception as exc:
             raise ValueError(f"Failed to reach catalog service: {exc}") from exc
 
@@ -49,6 +69,38 @@ class OrderCreateUseCase:
             )
 
         return response.json()
+
+    def _map_ingredient_fields(self, ingredient_data: dict) -> dict:
+        """Map catalog ingredient fields to entity fields"""
+        # Handle both naming conventions: appliesto_* and applies_to_*
+        mapped = ingredient_data.copy()
+        
+        # Convert price to Money object if it's a number
+        if "price" in mapped and not isinstance(mapped["price"], Money):
+            if isinstance(mapped["price"], (int, float)):
+                mapped["price"] = Money(amount=mapped["price"])
+            elif isinstance(mapped["price"], dict) and "amount" in mapped["price"]:
+                mapped["price"] = Money(**mapped["price"])
+        
+        # Map appliesto fields to applies_to if they exist
+        if "appliesto_burger" in mapped:
+            mapped["applies_to_burger"] = mapped.pop("appliesto_burger")
+        if "appliesto_side" in mapped:
+            mapped["applies_to_side"] = mapped.pop("appliesto_side")
+        if "appliesto_drink" in mapped:
+            mapped["applies_to_drink"] = mapped.pop("appliesto_drink")
+        if "appliesto_dessert" in mapped:
+            mapped["applies_to_dessert"] = mapped.pop("appliesto_dessert")
+        
+        # If applies_to fields are missing, infer from type
+        if "applies_to_burger" not in mapped:
+            ingredient_type = mapped.get("type", "")
+            mapped["applies_to_burger"] = ingredient_type in ["bread", "meat", "cheese", "vegetable", "salad", "sauce"]
+            mapped["applies_to_side"] = ingredient_type in ["salad", "sauce", "vegetable"]
+            mapped["applies_to_drink"] = ingredient_type in ["ice", "milk"]
+            mapped["applies_to_dessert"] = ingredient_type in ["topping"]
+        
+        return mapped
 
     def execute(self, request: OrderCreateRequest) -> OrderResponse:
         """Execute the order creation use case"""
@@ -87,6 +139,36 @@ class OrderCreateUseCase:
                     f"Product with ID {item_request.product_internal_id} is deactivated and cannot be added to new orders"
                 )
 
+            # Convert price to Money object if needed
+            if "price" in product_request and not isinstance(product_request["price"], Money):
+                if isinstance(product_request["price"], (int, float)):
+                    product_request["price"] = Money(amount=product_request["price"])
+                elif isinstance(product_request["price"], dict) and "amount" in product_request["price"]:
+                    product_request["price"] = Money(**product_request["price"])
+
+            # Convert default_ingredient from dict to ProductReceiptItem objects
+            from src.entities.product import ProductReceiptItem
+            default_ingredients = []
+            for ing_data in product_request.get("default_ingredient", []):
+                # Fetch complete ingredient data from catalog
+                ingredient_response = self._fetch_catalog(
+                    f"/ingredient/by-id/{ing_data.get('ingredient_internal_id')}?include_inactive=false"
+                )
+                if not ingredient_response:
+                    raise ValueError(
+                        f"Ingredient with ID {ing_data.get('ingredient_internal_id')} not found"
+                    )
+                
+                ingredient_response = self._map_ingredient_fields(ingredient_response)
+                ingredient_obj = Ingredient(**ingredient_response)
+                default_ingredients.append(
+                    ProductReceiptItem(
+                        ingredient=ingredient_obj,
+                        quantity=ing_data.get("quantity", 1)
+                    )
+                )
+            
+            product_request["default_ingredient"] = default_ingredients
             product = Product(**product_request)
 
             # Get additional ingredients - only allow active ingredients for new orders
@@ -103,6 +185,7 @@ class OrderCreateUseCase:
                     raise ValueError(
                         f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders"
                     )
+                ingredient = self._map_ingredient_fields(ingredient)
                 additional_ingredients.append(Ingredient(**ingredient))
 
             # Get remove ingredients - only allow active ingredients for new orders
@@ -119,6 +202,7 @@ class OrderCreateUseCase:
                     raise ValueError(
                         f"Ingredient with ID {ing_id} is deactivated and cannot be added to new orders"
                     )
+                ingredient = self._map_ingredient_fields(ingredient)
                 remove_ingredients.append(Ingredient(**ingredient))
 
             # Create order item
