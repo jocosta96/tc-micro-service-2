@@ -66,24 +66,7 @@ def make_controller():
                         "internal_id": 1,
                         "name": "Test",
                     }
-                else:
-                    from src.entities.product import ProductReceiptItem
-                    from src.entities.ingredient import IngredientType
-                    from src.entities.value_objects.name import Name
-                    from src.entities.value_objects.money import Money
-                    from src.entities.ingredient import Ingredient
-
-                    dummy_ing = Ingredient(
-                        name=Name.create("Queijo"),
-                        price=Money(amount=1.0),
-                        is_active=True,
-                        type=IngredientType.CHEESE,
-                        applies_to_burger=True,
-                        applies_to_side=False,
-                        applies_to_drink=False,
-                        applies_to_dessert=False,
-                        internal_id=1,
-                    )
+                elif "/product/" in path:
                     from src.entities.value_objects.money import Money
 
                     return {
@@ -91,9 +74,24 @@ def make_controller():
                         "internal_id": 1,
                         "name": "Test",
                         "price": Money(amount=10.0),
-                        "default_ingredient": [ProductReceiptItem(dummy_ing, 1)],
+                        "default_ingredient": [{"ingredient_internal_id": 1, "quantity": 1}],
                         "category": ProductCategory.BURGER,
                         "sku": "ABC-1234-XYZ",
+                    }
+                else:  # ingredient
+                    from src.entities.ingredient import IngredientType
+                    from src.entities.value_objects.money import Money
+
+                    return {
+                        "name": "Queijo",
+                        "price": Money(amount=1.0),
+                        "is_active": True,
+                        "type": IngredientType.CHEESE,
+                        "applies_to_burger": True,
+                        "applies_to_side": False,
+                        "applies_to_drink": False,
+                        "applies_to_dessert": False,
+                        "internal_id": 1,
                     }
 
             use_case._fetch_catalog = fake_catalog

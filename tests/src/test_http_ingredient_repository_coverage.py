@@ -1,10 +1,15 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from src.adapters.gateways.http_ingredient_repository import HTTPIngredientRepository
 
 
 class TestHTTPIngredientRepository:
+    @patch("src.adapters.gateways.http_ingredient_repository.get_ssm_client")
     @patch("src.adapters.gateways.http_ingredient_repository.requests.get")
-    def test_find_by_id_success(self, mock_get):
+    def test_find_by_id_success(self, mock_get, mock_ssm):
+        # Mock SSM client
+        mock_ssm_client = MagicMock()
+        mock_ssm_client.get_parameter.return_value = None
+        mock_ssm.return_value = mock_ssm_client
         # Given ingrediente existe
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {
@@ -23,8 +28,13 @@ class TestHTTPIngredientRepository:
         # Then retorna objeto Ingredient
         assert str(resp.name) == "Tomato"
 
+    @patch("src.adapters.gateways.http_ingredient_repository.get_ssm_client")
     @patch("src.adapters.gateways.http_ingredient_repository.requests.get")
-    def test_find_by_id_http_error(self, mock_get):
+    def test_find_by_id_http_error(self, mock_get, mock_ssm):
+        # Mock SSM client
+        mock_ssm_client = MagicMock()
+        mock_ssm_client.get_parameter.return_value = None
+        mock_ssm.return_value = mock_ssm_client
         # Given erro HTTP
         mock_get.return_value.status_code = 404
         repo = HTTPIngredientRepository("fake-url")
@@ -32,8 +42,13 @@ class TestHTTPIngredientRepository:
         resp = repo.find_by_id(1)
         assert resp is None
 
+    @patch("src.adapters.gateways.http_ingredient_repository.get_ssm_client")
     @patch("src.adapters.gateways.http_ingredient_repository.requests.get")
-    def test_find_by_id_empty_response(self, mock_get):
+    def test_find_by_id_empty_response(self, mock_get, mock_ssm):
+        # Mock SSM client
+        mock_ssm_client = MagicMock()
+        mock_ssm_client.get_parameter.return_value = None
+        mock_ssm.return_value = mock_ssm_client
         # Given resposta vazia
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = None
