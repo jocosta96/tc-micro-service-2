@@ -5,10 +5,9 @@ import requests
 
 from src.application.repositories.product_repository import ProductRepository
 from src.entities.product import Product, ProductCategory, ProductReceiptItem
-from src.entities.ingredient import Ingredient, IngredientType
+from src.entities.ingredient import Ingredient
 from src.entities.value_objects.sku import SKU
 from src.entities.value_objects.money import Money
-from src.entities.value_objects.name import Name
 from src.config.aws_ssm import get_ssm_client
 
 class HTTPProductRepository(ProductRepository):

@@ -14,11 +14,10 @@ from src.application.dto.implementation.order_dto import (
 )
 from src.entities.order import Order, OrderItem
 from src.entities.product import Product
-from src.entities.ingredient import Ingredient, IngredientType
+from src.entities.ingredient import Ingredient
 from src.config.aws_ssm import get_ssm_client
 
 from src.entities.value_objects.order_status import OrderStatus
-from src.entities.value_objects.name import Name
 from src.entities.value_objects.money import Money
 
 from requests import get
